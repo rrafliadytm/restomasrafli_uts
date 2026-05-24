@@ -1,5 +1,6 @@
 package com.example.restomasrafli
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -9,6 +10,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavType
@@ -28,7 +33,14 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            RestoMasRafliTheme {
+            val sharedPreferences = remember {
+                getSharedPreferences("resto_prefs", Context.MODE_PRIVATE)
+            }
+            var isDarkMode by remember {
+                mutableStateOf(sharedPreferences.getBoolean("is_dark_mode", false))
+            }
+
+            RestoMasRafliTheme(darkTheme = isDarkMode, dynamicColor = false) {
                 val navController = rememberNavController()
                 
                 NavHost(
@@ -38,7 +50,12 @@ class MainActivity : ComponentActivity() {
                     composable("home") {
                         HomeScreen(
                             onNavigateToMenu = { navController.navigate("menu") },
-                            onNavigateToProfile = { navController.navigate("profile") }
+                            onNavigateToProfile = { navController.navigate("profile") },
+                            isDarkMode = isDarkMode,
+                            onToggleDarkMode = { darkMode -> 
+                                isDarkMode = darkMode
+                                sharedPreferences.edit().putBoolean("is_dark_mode", darkMode).apply()
+                            }
                         )
                     }
                     composable("menu") {

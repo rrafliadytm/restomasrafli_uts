@@ -1,6 +1,9 @@
 package com.example.restomasrafli.ui.screen
 
 import android.content.Context
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -8,13 +11,19 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.LightMode
+import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.RestaurantMenu
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -34,7 +43,9 @@ import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 @Composable
 fun HomeScreen(
     onNavigateToMenu: () -> Unit,
-    onNavigateToProfile: () -> Unit
+    onNavigateToProfile: () -> Unit,
+    isDarkMode: Boolean,
+    onToggleDarkMode: (Boolean) -> Unit
 ) {
     val context = LocalContext.current
     val sharedPreferences = remember {
@@ -60,15 +71,25 @@ fun HomeScreen(
         logoUri.value = sharedPreferences.getString("logo_uri", "") ?: ""
     }
 
+    val backgroundColor1 by animateColorAsState(
+        if (isDarkMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) 
+        else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+        animationSpec = tween(500),
+        label = "bg1"
+    )
+    val backgroundColor2 by animateColorAsState(
+        if (isDarkMode) MaterialTheme.colorScheme.surface 
+        else MaterialTheme.colorScheme.surface,
+        animationSpec = tween(500),
+        label = "bg2"
+    )
+
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(
                 brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                        MaterialTheme.colorScheme.surface
-                    )
+                    colors = listOf(backgroundColor1, backgroundColor2)
                 )
             )
     ) {
@@ -86,25 +107,27 @@ fun HomeScreen(
                 modifier = Modifier
                     .size(180.dp)
                     .clip(CircleShape),
-                color = MaterialTheme.colorScheme.primary,
+                color = if (isDarkMode) MaterialTheme.colorScheme.secondaryContainer else MaterialTheme.colorScheme.primary,
                 tonalElevation = 8.dp,
                 shadowElevation = 12.dp
             ) {
-                if (logoUri.value.isNotEmpty()) {
-                    AsyncImage(
-                        model = logoUri.value,
-                        contentDescription = "Logo Restoran",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                } else {
-                    Box(contentAlignment = Alignment.Center) {
-                        Icon(
-                            imageVector = Icons.Default.Storefront,
+                Crossfade(targetState = isDarkMode, animationSpec = tween(500), label = "logo") { dark ->
+                    if (logoUri.value.isNotEmpty()) {
+                        AsyncImage(
+                            model = logoUri.value,
                             contentDescription = "Logo Restoran",
-                            modifier = Modifier.size(100.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
                         )
+                    } else {
+                        Box(contentAlignment = Alignment.Center, modifier = Modifier.fillMaxSize()) {
+                            Icon(
+                                imageVector = if (dark) Icons.Default.Fastfood else Icons.Default.Storefront,
+                                contentDescription = "Logo Restoran",
+                                modifier = Modifier.size(100.dp),
+                                tint = if (dark) MaterialTheme.colorScheme.onSecondaryContainer else MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
                     }
                 }
             }
@@ -121,7 +144,7 @@ fun HomeScreen(
                 Text(
                     text = "Selamat Datang di",
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.outline
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -179,6 +202,22 @@ fun HomeScreen(
             
             Spacer(modifier = Modifier.height(40.dp))
         }
+
+        // Theme Toggle Button moved to the end of Box to be on top of Column
+        IconButton(
+            onClick = { onToggleDarkMode(!isDarkMode) },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(top = 48.dp, end = 16.dp)
+                .clip(CircleShape)
+                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f))
+        ) {
+            Icon(
+                imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                contentDescription = "Toggle Dark Mode",
+                tint = MaterialTheme.colorScheme.primary
+            )
+        }
     }
 }
 
@@ -188,7 +227,9 @@ fun HomeScreenPreview() {
     RestoMasRafliTheme {
         HomeScreen(
             onNavigateToMenu = {},
-            onNavigateToProfile = {}
+            onNavigateToProfile = {},
+            isDarkMode = false,
+            onToggleDarkMode = {}
         )
     }
 }
