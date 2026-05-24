@@ -10,6 +10,9 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
@@ -19,12 +22,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.restomasrafli.ui.screen.cartItemsState
+import com.example.restomasrafli.ui.screen.CartItem
 import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -32,6 +38,8 @@ import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
     val menuItem = menuList.find { it.id == menuItemId }
     var rating by remember { mutableIntStateOf(5) }
+    var quantity by remember { mutableIntStateOf(0) }
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -66,18 +74,87 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                 shadowElevation = 16.dp,
                 color = MaterialTheme.colorScheme.surface
             ) {
-                Button(
-                    onClick = { /* Implement Order */ },
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(16.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Pesan Sekarang", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                if (quantity == 0) {
+                    Button(
+                        onClick = { quantity = 1 },
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary
+                        )
+                    ) {
+                        Icon(Icons.Default.Add, contentDescription = null)
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text("Tambah ke Pesanan", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                    }
+                } else {
+                    Column(
+                        modifier = Modifier
+                            .padding(16.dp)
+                            .fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            FilledTonalIconButton(
+                                onClick = { if (quantity > 0) quantity-- },
+                                modifier = Modifier.size(48.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Remove, contentDescription = "Kurangi")
+                            }
+                            
+                            Text(
+                                text = quantity.toString(),
+                                modifier = Modifier.padding(horizontal = 32.dp),
+                                style = MaterialTheme.typography.headlineMedium,
+                                fontWeight = FontWeight.ExtraBold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                            
+                            FilledIconButton(
+                                onClick = { quantity++ },
+                                modifier = Modifier.size(48.dp),
+                                shape = RoundedCornerShape(12.dp)
+                            ) {
+                                Icon(Icons.Default.Add, contentDescription = "Tambah")
+                            }
+                        }
+                        
+                        Button(
+                            onClick = {
+                                if (menuItem != null) {
+                                    val existingItem = cartItemsState.find { it.menuItem.id == menuItem.id }
+                                    if (existingItem != null) {
+                                        val index = cartItemsState.indexOf(existingItem)
+                                        cartItemsState[index] = existingItem.copy(quantity = existingItem.quantity + quantity)
+                                    } else {
+                                        cartItemsState.add(CartItem(menuItem, quantity))
+                                    }
+                                    
+                                    android.widget.Toast.makeText(
+                                        context,
+                                        "$quantity ${menuItem.name} ditambahkan ke keranjang",
+                                        android.widget.Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(56.dp),
+                            shape = RoundedCornerShape(16.dp)
+                        ) {
+                            Icon(Icons.Default.ShoppingCart, contentDescription = null)
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text("Tambahkan ke Keranjang", fontWeight = FontWeight.Bold, fontSize = 16.sp)
+                        }
+                    }
                 }
             }
         }
