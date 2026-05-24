@@ -1,7 +1,7 @@
-# Resto Mas Rafli
+**# Resto Mas Rafli**
 <br>
 <br>
-# Berikut adalah screenshot tampilan dari aplikasi Resto Mas Rafli saat Light Mode
+**# Berikut adalah screenshot tampilan dari aplikasi Resto Mas Rafli saat Light Mode**
 <img width="1080" height="2400" alt="Screenshot_20260524_195828" src="https://github.com/user-attachments/assets/be6b2556-0a07-444b-8000-e2e90d4685b8" />
 <img width="1080" height="2400" alt="Screenshot_20260524_195838" src="https://github.com/user-attachments/assets/496d48d2-a8ad-4c42-b409-3422a109bebc" />
 <img width="1080" height="2400" alt="Screenshot_20260524_195851" src="https://github.com/user-attachments/assets/9a8fefb6-5347-4c40-b37c-114d50ccce09" />
@@ -19,7 +19,7 @@
 <br>
 <br>
 <br>
-# Berikut adalah screenshot tampilan dari aplikasi Resto Mas Rafli saat Dark Mode
+**# Berikut adalah screenshot tampilan dari aplikasi Resto Mas Rafli saat Dark Mode**
 <img width="1080" height="2400" alt="Screenshot_20260524_192819" src="https://github.com/user-attachments/assets/f278bb70-c58b-4f9d-b3a0-f029701e013c" />
 <img width="1080" height="2400" alt="Screenshot_20260524_192930" src="https://github.com/user-attachments/assets/d7894a97-ece3-424d-b929-4709d7bb03bf" />
 <img width="1080" height="2400" alt="Screenshot_20260524_192942" src="https://github.com/user-attachments/assets/355c1402-78f6-4453-ad62-de909cf342db" />
@@ -32,8 +32,3 @@
 <img width="1080" height="2400" alt="Screenshot_20260524_193348" src="https://github.com/user-attachments/assets/815e6373-5914-4bb3-9754-6ddb979b2889" />
 <img width="1080" height="2400" alt="Screenshot_20260524_193340" src="https://github.com/user-attachments/assets/f5a1de5e-21c4-4908-86ee-10287418be5b" />
 <img width="1080" height="2400" alt="Screenshot_20260524_193354" src="https://github.com/user-attachments/assets/ceb3b261-e04d-45d1-a44b-dab87643a6bd" />
-
-
-
-
-
