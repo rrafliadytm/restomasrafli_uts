@@ -13,6 +13,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,27 +29,46 @@ import androidx.compose.ui.unit.sp
 import com.example.restomasrafli.R
 import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 
+enum class MenuCategory {
+    MAKANAN, MINUMAN
+}
+
 data class MenuItem(
     val id: String,
     val name: String,
     val price: String,
-    val imageRes: Int
+    val imageRes: Int,
+    val category: MenuCategory
 )
 
 val menuList = listOf(
-    MenuItem("1", "Nasi Goreng Spesial", "Rp 25.000", R.drawable.ic_launcher_foreground),
-    MenuItem("2", "Mie Ayam Bakso", "Rp 18.000", R.drawable.ic_launcher_foreground),
-    MenuItem("3", "Ayam Bakar Madu", "Rp 30.000", R.drawable.ic_launcher_foreground),
-    MenuItem("4", "Es Teh Manis", "Rp 5.000", R.drawable.ic_launcher_foreground),
-    MenuItem("5", "Jus Jeruk Segar", "Rp 12.000", R.drawable.ic_launcher_foreground),
-    MenuItem("6", "Kopi Susu", "Rp 15.000", R.drawable.ic_launcher_foreground)
+    MenuItem("1", "Nasi Goreng Spesial", "Rp 25.000", R.drawable.nasgor, MenuCategory.MAKANAN),
+    MenuItem("2", "Mie Ayam Bakso", "Rp 18.000", R.drawable.mieayambakso, MenuCategory.MAKANAN),
+    MenuItem("3", "Ayam Bakar Madu", "Rp 30.000", R.drawable.ayambakarmadu, MenuCategory.MAKANAN),
+    MenuItem("4", "Es Teh Manis", "Rp 5.000", R.drawable.esteh, MenuCategory.MINUMAN),
+    MenuItem("5", "Jus Jeruk Segar", "Rp 12.000", R.drawable.jusjeruk, MenuCategory.MINUMAN),
+    MenuItem("6", "Kopi Susu", "Rp 15.000", R.drawable.kopsus, MenuCategory.MINUMAN),
+    MenuItem("7", "Sate Ayam", "Rp 22.000", R.drawable.sate, MenuCategory.MAKANAN),
+    MenuItem("8", "Soto Ayam", "Rp 20.000", R.drawable.soto, MenuCategory.MAKANAN),
+    MenuItem("9", "Gado-Gado", "Rp 18.000", R.drawable.gado, MenuCategory.MAKANAN),
+    MenuItem("10", "Nasi Padang", "Rp 28.000", R.drawable.naspad, MenuCategory.MAKANAN),
+    MenuItem("11", "Rendang Daging", "Rp 35.000", R.drawable.rendang, MenuCategory.MAKANAN),
+    MenuItem("12", "Gurame Bakar", "Rp 40.000", R.drawable.gurame, MenuCategory.MAKANAN),
+    MenuItem("13", "Jus Alpukat", "Rp 15.000", R.drawable.alpukat, MenuCategory.MINUMAN),
+    MenuItem("14", "Es Campur", "Rp 12.000", R.drawable.escampur, MenuCategory.MINUMAN),
+
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MenuScreen(onBack: () -> Unit, onNavigateToDetail: (String) -> Unit) {
     var searchQuery by remember { mutableStateOf("") }
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    
     val filteredMenu = menuList.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    
+    val makanan = filteredMenu.filter { it.category == MenuCategory.MAKANAN }
+    val minuman = filteredMenu.filter { it.category == MenuCategory.MINUMAN }
 
     Scaffold(
         topBar = {
@@ -71,7 +91,7 @@ fun MenuScreen(onBack: () -> Unit, onNavigateToDetail: (String) -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 )
             )
@@ -101,35 +121,57 @@ fun MenuScreen(onBack: () -> Unit, onNavigateToDetail: (String) -> Unit) {
                 )
             )
 
+            // Tab Kategori untuk pengelompokan yang lebih jelas
+            TabRow(
+                selectedTabIndex = selectedTabIndex,
+                containerColor = Color.Transparent,
+                contentColor = MaterialTheme.colorScheme.primary,
+                divider = {},
+                indicator = { tabPositions ->
+                    if (selectedTabIndex < tabPositions.size) {
+                        TabRowDefaults.SecondaryIndicator(
+                            Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            ) {
+                Tab(
+                    selected = selectedTabIndex == 0,
+                    onClick = { selectedTabIndex = 0 },
+                    text = { Text("Makanan", fontWeight = FontWeight.Bold) }
+                )
+                Tab(
+                    selected = selectedTabIndex == 1,
+                    onClick = { selectedTabIndex = 1 },
+                    text = { Text("Minuman", fontWeight = FontWeight.Bold) }
+                )
+            }
+
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
-                item {
-                    Text(
-                        text = "Daftar Menu",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 8.dp),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                }
+                val currentList = if (selectedTabIndex == 0) makanan else minuman
                 
-                items(filteredMenu) { item ->
+                items(currentList) { item ->
                     MenuListItem(
                         item = item,
                         onClick = { onNavigateToDetail(item.id) }
                     )
                 }
                 
-                if (filteredMenu.isEmpty()) {
+                if (currentList.isEmpty()) {
                     item {
                         Box(
                             modifier = Modifier.fillMaxWidth().padding(top = 40.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            Text("Menu tidak ditemukan", color = MaterialTheme.colorScheme.outline)
+                            Text(
+                                if (searchQuery.isEmpty()) "Belum ada menu di kategori ini" else "Menu tidak ditemukan",
+                                color = MaterialTheme.colorScheme.outline
+                            )
                         }
                     }
                 }

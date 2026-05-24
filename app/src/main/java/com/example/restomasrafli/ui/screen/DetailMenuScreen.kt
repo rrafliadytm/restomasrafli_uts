@@ -2,6 +2,7 @@ package com.example.restomasrafli.ui.screen
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -9,12 +10,13 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -29,6 +31,7 @@ import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 @Composable
 fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
     val menuItem = menuList.find { it.id == menuItemId }
+    var rating by remember { mutableIntStateOf(5) }
 
     Scaffold(
         topBar = {
@@ -51,10 +54,32 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
                     }
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color.Transparent
                 )
             )
+        },
+        bottomBar = {
+            Surface(
+                modifier = Modifier.fillMaxWidth(),
+                tonalElevation = 8.dp,
+                shadowElevation = 16.dp,
+                color = MaterialTheme.colorScheme.surface
+            ) {
+                Button(
+                    onClick = { /* Implement Order */ },
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(16.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary
+                    )
+                ) {
+                    Text("Pesan Sekarang", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                }
+            }
         }
     ) { innerPadding ->
         if (menuItem != null) {
@@ -66,10 +91,10 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                     .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Hero Image / Icon Section
+                // Hero Image
                 Surface(
                     modifier = Modifier
-                        .size(200.dp)
+                        .size(220.dp)
                         .clip(RoundedCornerShape(32.dp)),
                     color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
                 ) {
@@ -81,7 +106,7 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 // Detail Content Card
                 Card(
@@ -93,7 +118,7 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                     elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(32.dp),
+                        modifier = Modifier.padding(24.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
@@ -104,22 +129,44 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                             textAlign = TextAlign.Center
                         )
                         
+                        Spacer(modifier = Modifier.height(8.dp))
+                        
+                        Text(
+                            text = menuItem.price,
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        Surface(
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = RoundedCornerShape(16.dp)
+                        // Interactive Star Rating
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.Center
                         ) {
+                            repeat(5) { index ->
+                                val starIndex = index + 1
+                                Icon(
+                                    imageVector = if (starIndex <= rating) Icons.Filled.Star else Icons.Outlined.Star,
+                                    contentDescription = "Bintang $starIndex",
+                                    tint = if (starIndex <= rating) Color(0xFFFFC107) else MaterialTheme.colorScheme.outlineVariant,
+                                    modifier = Modifier
+                                        .size(36.dp)
+                                        .clickable { rating = starIndex }
+                                        .padding(2.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = menuItem.price,
-                                modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onPrimary,
+                                text = "($rating/5)",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = MaterialTheme.colorScheme.outline,
                                 fontWeight = FontWeight.Bold
                             )
                         }
                         
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(24.dp))
                         
                         HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
                         
@@ -146,20 +193,7 @@ fun DetailMenuScreen(menuItemId: String, onBack: () -> Unit) {
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(40.dp))
-                
-                Button(
-                    onClick = { /* Implement add to favorite or order */ },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(60.dp),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary
-                    )
-                ) {
-                    Text("Pesan Sekarang", fontWeight = FontWeight.Bold, fontSize = 18.sp)
-                }
+                Spacer(modifier = Modifier.height(24.dp))
             }
         } else {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
