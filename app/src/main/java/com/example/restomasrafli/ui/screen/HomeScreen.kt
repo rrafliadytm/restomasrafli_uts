@@ -20,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -27,6 +28,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import coil.compose.AsyncImage
 import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 
 @Composable
@@ -47,6 +49,15 @@ fun HomeScreen(
 
     val restoName = remember {
         mutableStateOf(sharedPreferences.getString("name", "Resto Mas Rafli") ?: "Resto Mas Rafli")
+    }
+    val logoUri = remember {
+        mutableStateOf(sharedPreferences.getString("logo_uri", "") ?: "")
+    }
+
+    // Refresh data whenever the screen is re-composed or when returning from other screens
+    LaunchedEffect(key1 = Unit) {
+        restoName.value = sharedPreferences.getString("name", "Resto Mas Rafli") ?: "Resto Mas Rafli"
+        logoUri.value = sharedPreferences.getString("logo_uri", "") ?: ""
     }
 
     Box(
@@ -79,57 +90,60 @@ fun HomeScreen(
                 tonalElevation = 8.dp,
                 shadowElevation = 12.dp
             ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Default.Storefront,
+                if (logoUri.value.isNotEmpty()) {
+                    AsyncImage(
+                        model = logoUri.value,
                         contentDescription = "Logo Restoran",
-                        modifier = Modifier.size(100.dp),
-                        tint = MaterialTheme.colorScheme.onPrimary
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Crop
                     )
+                } else {
+                    Box(contentAlignment = Alignment.Center) {
+                        Icon(
+                            imageVector = Icons.Default.Storefront,
+                            contentDescription = "Logo Restoran",
+                            modifier = Modifier.size(100.dp),
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
             }
 
             Spacer(modifier = Modifier.height(40.dp))
 
-            // Welcome Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(32.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            // Welcome Section
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = "Selamat Datang di",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.outline
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Selamat Datang di",
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.outline
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(
-                        text = restoName.value,
-                        style = MaterialTheme.typography.displaySmall.copy(
-                            fontWeight = FontWeight.ExtraBold,
-                            textAlign = TextAlign.Center
-                        ),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Text(
-                        text = "Rasakan sensasi kuliner terbaik dengan cita rasa autentik dan pelayanan istimewa.",
-                        style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                Text(
+                    text = restoName.value,
+                    style = MaterialTheme.typography.displayMedium.copy(
+                        fontWeight = FontWeight.ExtraBold,
+                        textAlign = TextAlign.Center
+                    ),
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Rasakan sensasi kuliner terbaik dengan cita rasa autentik dan pelayanan istimewa.",
+                    style = MaterialTheme.typography.bodyLarge,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 24.dp)
+                )
             }
 
             Spacer(modifier = Modifier.height(48.dp))
