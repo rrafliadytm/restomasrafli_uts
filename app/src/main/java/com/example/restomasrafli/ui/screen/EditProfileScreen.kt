@@ -57,7 +57,7 @@ fun EditProfileScreen(onBack: () -> Unit) {
         R.drawable.nasgor, R.drawable.mieayambakso, R.drawable.ayambakarmadu,
         R.drawable.sate, R.drawable.soto, R.drawable.gado, R.drawable.naspad,
         R.drawable.rendang, R.drawable.gurame, R.drawable.esteh, R.drawable.kopsus,
-        R.drawable.alpukat, R.drawable.escampur, R.drawable.jusjeruk
+        R.drawable.alpukat, R.drawable.escampur, R.drawable.jusjeruk, R.drawable.icon
     )
 
     val launcher = rememberLauncherForActivityResult(
