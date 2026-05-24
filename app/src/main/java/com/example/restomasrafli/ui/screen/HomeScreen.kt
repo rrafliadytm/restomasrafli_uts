@@ -72,7 +72,7 @@ fun HomeScreen(
     }
 
     val backgroundColor1 by animateColorAsState(
-        if (isDarkMode) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f) 
+        if (isDarkMode) MaterialTheme.colorScheme.surface
         else MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
         animationSpec = tween(500),
         label = "bg1"
@@ -87,9 +87,12 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(backgroundColor1, backgroundColor2)
+            .then(
+                if (isDarkMode) Modifier.background(backgroundColor1)
+                else Modifier.background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(backgroundColor1, backgroundColor2)
+                    )
                 )
             )
     ) {

@@ -26,6 +26,7 @@ import com.example.restomasrafli.ui.screen.EditProfileScreen
 import com.example.restomasrafli.ui.screen.HomeScreen
 import com.example.restomasrafli.ui.screen.MenuScreen
 import com.example.restomasrafli.ui.screen.ProfileScreen
+import com.example.restomasrafli.ui.screen.SplashScreen
 import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 
 class MainActivity : ComponentActivity() {
@@ -45,8 +46,18 @@ class MainActivity : ComponentActivity() {
                 
                 NavHost(
                     navController = navController,
-                    startDestination = "home"
+                    startDestination = "splash"
                 ) {
+                    composable("splash") {
+                        SplashScreen(
+                            isDarkMode = isDarkMode,
+                            onNavigateToHome = {
+                                navController.navigate("home") {
+                                    popUpTo("splash") { inclusive = true }
+                                }
+                            }
+                        )
+                    }
                     composable("home") {
                         HomeScreen(
                             onNavigateToMenu = { navController.navigate("menu") },
@@ -77,7 +88,12 @@ class MainActivity : ComponentActivity() {
                     composable("profile") {
                         ProfileScreen(
                             onBack = { navController.popBackStack() },
-                            onNavigateToEditProfile = { navController.navigate("edit-profile") }
+                            onNavigateToEditProfile = { navController.navigate("edit-profile") },
+                            isDarkMode = isDarkMode,
+                            onToggleDarkMode = { darkMode ->
+                                isDarkMode = darkMode
+                                sharedPreferences.edit().putBoolean("is_dark_mode", darkMode).apply()
+                            }
                         )
                     }
                     composable("edit-profile") {

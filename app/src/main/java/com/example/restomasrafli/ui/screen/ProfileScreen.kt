@@ -12,6 +12,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccessTime
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Storefront
 import androidx.compose.material3.*
@@ -32,12 +34,17 @@ import com.example.restomasrafli.ui.theme.RestoMasRafliTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(onBack: () -> Unit, onNavigateToEditProfile: () -> Unit) {
+fun ProfileScreen(
+    onBack: () -> Unit,
+    onNavigateToEditProfile: () -> Unit,
+    isDarkMode: Boolean,
+    onToggleDarkMode: (Boolean) -> Unit
+) {
     val context = LocalContext.current
     val sharedPreferences = context.getSharedPreferences("resto_prefs", Context.MODE_PRIVATE)
 
     val name = sharedPreferences.getString("name", "Resto Mas Rafli") ?: "Resto Mas Rafli"
-    val address = sharedPreferences.getString("address", "Jl. Masakan Lezat No. 123, Jakarta") ?: "Jl. Masakan Lezat No. 123, Jakarta"
+    val address = sharedPreferences.getString("address", "Sawojajar 2, Malang") ?: "Sawoajajar 2 Malang"
     val description = sharedPreferences.getString("description", "Menyajikan hidangan terbaik dengan cinta dan bahan berkualitas.") ?: "Menyajikan hidangan terbaik dengan cinta dan bahan berkualitas."
     val hours = sharedPreferences.getString("hours", "10:00 - 22:00") ?: "10:00 - 22:00"
     val logoUri = sharedPreferences.getString("logo_uri", "") ?: ""
@@ -61,6 +68,20 @@ fun ProfileScreen(onBack: () -> Unit, onNavigateToEditProfile: () -> Unit) {
                             .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
                     ) {
                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { onToggleDarkMode(!isDarkMode) },
+                        modifier = Modifier
+                            .padding(8.dp)
+                            .clip(CircleShape)
+                            .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f))
+                    ) {
+                        Icon(
+                            imageVector = if (isDarkMode) Icons.Default.LightMode else Icons.Default.DarkMode,
+                            contentDescription = "Toggle Dark Mode"
+                        )
                     }
                 },
                 colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
@@ -206,6 +227,11 @@ fun ProfileInfoCard(icon: ImageVector, label: String, value: String) {
 @Composable
 fun ProfileScreenPreview() {
     RestoMasRafliTheme {
-        ProfileScreen(onBack = {}, onNavigateToEditProfile = {})
+        ProfileScreen(
+            onBack = {},
+            onNavigateToEditProfile = {},
+            isDarkMode = false,
+            onToggleDarkMode = {}
+        )
     }
 }
